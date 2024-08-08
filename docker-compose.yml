@@ -1,0 +1,57 @@
+services:
+  frontend:
+    container_name: kupipodariday-frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    networks:
+      - frontend
+    image: kupipodariday-frontend-image
+    ports:
+      - "8081:80"
+    restart: on-failure 
+
+  backend:
+    container_name: kupipodariday-backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    networks:
+      - backend
+    image: kupipodariday-backend-image
+    ports:
+      - "4000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: on-failure 
+
+  postgres:
+    container_name: postgres
+    networks:
+      - backend
+    image: postgres
+    volumes:
+      - postgres_data:/data/postgres
+    env_file:
+      - .env
+    restart: on-failure 
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    ports:
+      - 8085:8080
+    networks:
+      - backend
+    depends_on:
+      - postgres
+    restart: on-failure 
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  postgres_data:
